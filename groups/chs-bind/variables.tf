@@ -3,6 +3,23 @@ variable "aws_account" {
   description = "The name of the AWS account in which resources will be provisioned."
 }
 
+variable "vpc_id" {
+  type = string
+}
+
+variable "aws_vpc" {
+  description = "VPC ID"
+  type        = string
+}
+
+variable "subnet_secondary" {
+  type = string
+}
+
+variable "subnet_primary" {
+  type = string
+}
+
 variable "aws_region" {
   type        = string
   description = "The AWS region in which resources will be created."
@@ -108,4 +125,14 @@ variable "monitoring" {
   type        = bool
   description = "Variable to determine is monitoring is enabled"
   default     = false
+}
+
+variable "application_subnet_ids" {
+  description = "List of application subnet IDs"
+  type        = list(string)
+
+  validation {
+    condition     = alltrue([for id in var.application_subnet_ids : can(regex("^subnet-[0-9a-f]+$", id))])
+    error_message = "All subnet IDs must be valid AWS subnet IDs (subnet-xxxxxxxx)."
+  }
 }

@@ -6,8 +6,14 @@ environment = "development"
 dns_zone    = "development.aws.internal"
 
 vpc_id           = "vpc-038dd851d393e2039"
-subnet_primary   = "subnet-0c13a80db1f01cb53"
-subnet_secondary = "subnet-092045ea5ea8cd54c"
+aws_vpc          = "management"
+
+subnet_primary        = "subnet-0c13a80db1f01cb53"
+subnet_secondary     = "subnet-092045ea5ea8cd54c"
+application_subnet_ids = [
+  "subnet-0c13a80db1f01cb53",
+  "subnet-092045ea5ea8cd54c"
+]
 
 
 # Instance details

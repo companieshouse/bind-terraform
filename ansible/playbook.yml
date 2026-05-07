@@ -1,8 +1,0 @@
----
-- name: Install Bind server and requirements
-  hosts: all
-  become: true
-  gather_facts: true
-  roles:
-    - role: prerequisites
-#    - role: companieshouse.security.security_scans

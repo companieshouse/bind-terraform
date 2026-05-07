@@ -2,8 +2,12 @@ data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {
   name = "administration-cidr-ranges"
 }
 
-data "aws_ec2_managed_prefix_list" "shared_services_cidr_ranges" {
-  name = "shared-services-management-cidrs"
+#data "aws_ec2_managed_prefix_list" "shared_services_cidr_ranges" {
+#  name = "shared-services-management-cidrs"
+#}
+
+data "aws_ec2_managed_prefix_list" "development_cidr_ranges" {
+  name = "development-management-cidrs"
 }
 
 data "aws_kms_alias" "ebs" {
@@ -18,7 +22,7 @@ data "vault_generic_secret" "kms_key_alias" {
 }
 
 data "aws_vpc" "this" {
-  filter {
+ filter {
     name   = "tag:Name"
     values = ["vpc-${var.aws_account}"]
   }
@@ -26,27 +30,32 @@ data "aws_vpc" "this" {
 
 data "aws_route53_zone" "chs-bind" {
   name   = var.dns_zone
-  vpc_id = data.aws_vpc.this.id
+  vpc_id = var.vpc_id
 }
 
 data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-data "aws_subnets" "application" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.this.id]
-  }
+#data "aws_subnets" "application" {
+#  filter {
+#    name   = "vpc-id"
+#    values = [var.vpc_id]
+#  }
 
-  filter {
-    name   = "tag:Name"
-    values = [var.application_subnet_pattern]
-  }
-}
+#  filter {
+#    name   = "tag:Name"
+#    values = [var.application_subnet_pattern]
+#  }
+#}
+
+#data "aws_subnet" "application" {
+#  for_each = toset(data.aws_subnets.application.ids)
+#  id       = each.value
+#}
 
 data "aws_subnet" "application" {
-  for_each = toset(data.aws_subnets.application.ids)
+  for_each = toset(var.application_subnet_ids)
   id       = each.value
 }
 
