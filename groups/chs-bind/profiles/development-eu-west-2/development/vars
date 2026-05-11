@@ -8,8 +8,8 @@ dns_zone    = "development.aws.internal"
 vpc_id           = "vpc-038dd851d393e2039"
 aws_vpc          = "management"
 
-subnet_primary        = "subnet-0c13a80db1f01cb53"
-subnet_secondary     = "subnet-092045ea5ea8cd54c"
+subnet_master        = "subnet-0c13a80db1f01cb53"
+subnet_slave     = "subnet-092045ea5ea8cd54c"
 application_subnet_ids = [
   "subnet-0c13a80db1f01cb53",
   "subnet-092045ea5ea8cd54c"
@@ -18,7 +18,7 @@ application_subnet_ids = [
 
 # Instance details
 
-instance_count = "3"
+instance_count = "2"
 instance_type = "t3.medium"
 root_volume_size = 30
 service = "chs"

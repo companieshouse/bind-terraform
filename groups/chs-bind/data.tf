@@ -2,12 +2,8 @@ data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {
   name = "administration-cidr-ranges"
 }
 
-#data "aws_ec2_managed_prefix_list" "shared_services_cidr_ranges" {
-#  name = "shared-services-management-cidrs"
-#}
-
-data "aws_ec2_managed_prefix_list" "development_cidr_ranges" {
-  name = "development-management-cidrs"
+data "aws_ec2_managed_prefix_list" "shared_services_cidr_ranges" {
+  name = "shared-services-management-cidrs"
 }
 
 data "aws_kms_alias" "ebs" {
@@ -21,7 +17,7 @@ data "vault_generic_secret" "kms_key_alias" {
   path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/kms_key_alias"
 }
 
-data "aws_vpc" "this" {
+data "aws_vpc" "management" {
  filter {
     name   = "tag:Name"
     values = ["vpc-${var.aws_account}"]
@@ -75,8 +71,8 @@ data "aws_ami" "chs-bind_ami" {
 }
 
 data "vault_generic_secret" "ami_owner" {
-#  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/${var.service_subtype}"
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/${var.service_subtype}"
+  
 }
 
 data "vault_generic_secret" "account_ids" {
@@ -101,8 +97,4 @@ data "vault_generic_secret" "sns_email" {
 
 data "vault_generic_secret" "sns_url" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
-}
-
-data "vault_generic_secret" "chs-bind_ansible_ssh_keys" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/${var.service_subtype}"
 }

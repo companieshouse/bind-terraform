@@ -33,14 +33,9 @@ locals {
   #linux_sns_email  = local.sns_email_secret["linux_email"]
   linux_sns_email  = local.sns_email_secret["sns_private_key"]
 
-  bind_ansible_ssh_secrets    = data.vault_generic_secret.bind_ansible_ssh_keys.data
-  bind_ansible_ssh_public_key = local.bind_ansible_ssh_secrets["ansible_ssh_public_key"]
-
   ami_owner    = data.vault_generic_secret.ami_owner.data
   ami_owner_id = local.ami_owner["ami_owner"]
 
-  bind_ansible_public_ssh_key_lookup = nonsensitive(data.vault_generic_secret.chs-bind_ansible_ssh_keys.data)
-  bind_ansible_public_ssh_key        = base64decode(local.bind_ansible_public_ssh_key_lookup["ansible_ssh_public_key"])
 
   disk_info = {
     root_vol = {

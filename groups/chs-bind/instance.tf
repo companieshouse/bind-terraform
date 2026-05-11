@@ -4,7 +4,7 @@ resource "aws_instance" "bind" {
   ami           = data.aws_ami.chs-bind_ami.id
   instance_type = var.instance_type
 #subnet_id     = element(local.application_subnet_ids_by_az, count.index)
-  subnet_id                   = var.subnet_primary
+  subnet_id                   = var.subnet_master
   key_name      = aws_key_pair.bind_ansible.key_name
 
   iam_instance_profile   = module.instance_profile.aws_iam_instance_profile.name
@@ -30,10 +30,5 @@ resource "aws_instance" "bind" {
       Backup = true
     })
   }
-}
-
-resource "aws_key_pair" "bind_ansible" {
-  key_name   = "${local.common_resource_name}-ansible"
-  public_key = local.bind_ansible_public_ssh_key
 }
 

@@ -12,11 +12,11 @@ variable "aws_vpc" {
   type        = string
 }
 
-variable "subnet_secondary" {
+variable "subnet_master" {
   type = string
 }
 
-variable "subnet_primary" {
+variable "subnet_slave" {
   type = string
 }
 
