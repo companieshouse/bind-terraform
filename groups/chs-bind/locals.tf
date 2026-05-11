@@ -29,6 +29,8 @@ locals {
   kms_key       = data.vault_generic_secret.kms_key_alias.data
   kms_key_alias = local.kms_key["kms_key_alias"]
 
+  ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
+
   sns_email_secret = data.vault_generic_secret.sns_email.data
   #linux_sns_email  = local.sns_email_secret["linux_email"]
   linux_sns_email  = local.sns_email_secret["sns_private_key"]

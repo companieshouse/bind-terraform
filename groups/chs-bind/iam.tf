@@ -1,5 +1,5 @@
 module "instance_profile" {
-  source = "git::https://github.com/companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.283"
+  source = "git@github.com:companieshouse/terraform-modules//aws/instance_profile?ref=tags/1.0.283"
   name   = local.common_resource_name
 
   enable_ssm   = true

@@ -33,6 +33,10 @@ data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
+data "vault_generic_secret" "ec2_user_ssh_public_key" {
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/${local.common_resource_name}"
+}
+
 #data "aws_subnets" "application" {
 #  filter {
 #    name   = "vpc-id"

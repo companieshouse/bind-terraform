@@ -5,7 +5,7 @@ resource "aws_instance" "bind" {
   instance_type = var.instance_type
 #subnet_id     = element(local.application_subnet_ids_by_az, count.index)
   subnet_id                   = var.subnet_master
-  key_name      = aws_key_pair.bind_ansible.key_name
+  key_name      = aws_key_pair.bind_terraform.key_name
 
   iam_instance_profile   = module.instance_profile.aws_iam_instance_profile.name
   vpc_security_group_ids = [aws_security_group.bind.id]
@@ -31,4 +31,7 @@ resource "aws_instance" "bind" {
     })
   }
 }
-
+resource "aws_key_pair" "bind_terraform" {
+  key_name   = "${local.common_resource_name}-public-key"
+  public_key = local.ssh_public_key
+}

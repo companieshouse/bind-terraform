@@ -1,7 +1,6 @@
 resource "aws_security_group" "bind" {
   name        = local.common_resource_name
   description = "Security group for the ${var.service_subtype} EC2 instances"
-  vpc_id      = data.aws_vpc.this.id
 
   tags = merge(local.common_tags, {
     Name = "${local.common_resource_name}"
