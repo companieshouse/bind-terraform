@@ -28,34 +28,30 @@ resource "aws_vpc_security_group_ingress_rule" "bind_ssh_shared_services" {
 
 # TCP DNS (port 53)
 resource "aws_vpc_security_group_ingress_rule" "bind_dns_tcp" {
-  for_each = {
-    for id, subnet in data.aws_subnet.application :
-    id => subnet.cidr_block
-  }
+  for_each = data.aws_subnet.by_id
 
-  description       = "Allow BIND TCP from app subnet ${each.key}"
-  security_group_id = aws_security_group.bind.id
-  cidr_ipv4         = each.value
+  security_group_id = var.security_group_id
 
+  cidr_ipv4  = each.value.cidr_block
+  from_port  = 53
+  to_port    = 53
   ip_protocol = "tcp"
-  from_port   = 53
-  to_port     = 53
+
+  description = "Allow BIND TCP from ${each.key}"
 }
 
 # UDP DNS (port 53)
 resource "aws_vpc_security_group_ingress_rule" "bind_dns_udp" {
-  for_each = {
-    for id, subnet in data.aws_subnet.application :
-    id => subnet.cidr_block
-  }
+  for_each = data.aws_subnet.by_id
 
-  description       = "Allow BIND UDP from app subnet ${each.key}"
-  security_group_id = aws_security_group.bind.id
-  cidr_ipv4         = each.value
+  security_group_id = var.security_group_id
 
+  cidr_ipv4  = each.value.cidr_block
+  from_port  = 53
+  to_port    = 53
   ip_protocol = "udp"
-  from_port   = 53
-  to_port     = 53
+
+  description = "Allow BIND UDP from ${each.key}"
 }
 
 # Egress

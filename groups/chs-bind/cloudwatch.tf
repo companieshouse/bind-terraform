@@ -67,7 +67,7 @@ resource "aws_cloudwatch_metric_alarm" "bind_server_root_disk_space" {
   dimensions = {
     path         = local.disk_info.root_vol.path
     InstanceId   = aws_instance.bind[count.index].id
-    ImageId      = data.aws_ami.chs-bind_ami.id
+    ImageId      = local.ami_id
     InstanceType = var.instance_type
     device       = local.disk_info.root_vol.device
     fstype       = local.disk_info.root_vol.fstype

@@ -18,15 +18,24 @@ data "vault_generic_secret" "kms_key_alias" {
 }
 
 data "aws_vpc" "management" {
- filter {
+  count = var.vpc_id != "" ? 1 : 0
+
+  id = var.vpc_id
+}
+
+data "aws_vpc" "management_by_tag" {
+  count = var.vpc_id == "" ? 1 : 0
+
+  filter {
     name   = "tag:Name"
-    values = ["vpc-${var.aws_account}"]
+    values = [var.aws_vpc]
   }
 }
 
 data "aws_route53_zone" "chs-bind" {
   name   = var.dns_zone
   vpc_id = var.vpc_id
+  private_zone = true
 }
 
 data "vault_generic_secret" "internal_cidrs" {
@@ -37,40 +46,45 @@ data "vault_generic_secret" "ec2_user_ssh_public_key" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/${local.common_resource_name}"
 }
 
-#data "aws_subnets" "application" {
-#  filter {
-#    name   = "vpc-id"
-#    values = [var.vpc_id]
-#  }
-
-#  filter {
-#    name   = "tag:Name"
-#    values = [var.application_subnet_pattern]
-#  }
-#}
-
-#data "aws_subnet" "application" {
-#  for_each = toset(data.aws_subnets.application.ids)
-#  id       = each.value
-#}
-
-data "aws_subnet" "application" {
-  for_each = toset(var.application_subnet_ids)
-  id       = each.value
+data "aws_subnet" "master" {
+  id = var.subnet_master
 }
 
-data "aws_ami" "chs-bind_ami" {
-  most_recent = true
-  name_regex  = "^chs-bind-ami-\\d.\\d.\\d"
+data "aws_subnet" "slave" {
+  id = var.subnet_slave
+}
 
+data "aws_subnets" "application" {
   filter {
-    name   = "name"
-    values = ["chs-bind-${var.ami_version_pattern}"]
+    name   = "vpc-id"
+    values = [local.resolved_vpc_id]
   }
 
   filter {
-    name   = "owner-id"
-    values = ["${local.ami_owner_id}"]
+    name   = "subnet-id"
+    values = var.application_subnet_ids
+  }
+}
+
+data "aws_subnet" "by_id" {
+  for_each = toset(var.application_subnet_ids)
+
+  id = each.value
+}
+
+data "aws_ami" "al2023" {
+  count       = var.ec2_ami_id == "" ? 1 : 0
+  most_recent = true
+  owners      = ["591542846629"]
+
+  filter {
+    name   = "name"
+    values = [var.ec2_ami_name_regex]
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
   }
 }
 

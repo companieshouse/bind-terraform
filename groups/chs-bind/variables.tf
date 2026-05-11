@@ -84,10 +84,30 @@ variable "root_block_device_volume_type" {
   type        = string
 }
 
+
+variable "ec2_ami_name_regex" {
+  description = "Regex pattern to lookup AMI when ec2_ami_id is empty"
+  type        = string
+  default     = "^al2023-ami-ecs-hvm-2023.0.2026*-kernel-6.1-x86_64"
+}
+
+
+variable "ec2_ami_id" {
+  description = "Explicit AMI ID (overrides regex lookup if set)"
+  type        = string
+  default     = ""
+}
+
 variable "instance_type" {
   type        = string
   description = "The instance type to use for EC2 instances."
   default     = "t3.medium"
+}
+
+variable "security_group_id" {
+  description = "Security group ID for BIND DNS servers"
+  type        = string
+  default     = "sg-0cc299c4828f98b13"
 }
 
 variable "application_subnet_pattern" {
