@@ -3,18 +3,8 @@
 aws_account = "development"
 aws_region  = "eu-west-2"
 environment = "development"
-dns_zone    = "development.aws.internal."
-
-vpc_id           = "vpc-038dd851d393e2039"
-aws_vpc          = "management"
-
-subnet_master        = "subnet-0c13a80db1f01cb53"
-subnet_slave     = "subnet-092045ea5ea8cd54c"
-application_subnet_ids = [
-  "subnet-0c13a80db1f01cb53",
-  "subnet-092045ea5ea8cd54c"
-]
-
+dns_zone    = "internal.chdev.org."
+# dns_zone    = "development.aws.internal."
 
 # Instance details
 

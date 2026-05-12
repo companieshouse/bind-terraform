@@ -84,13 +84,11 @@ variable "root_block_device_volume_type" {
   type        = string
 }
 
-
 variable "ec2_ami_name_regex" {
-  description = "Regex pattern to lookup AMI when ec2_ami_id is empty"
+  description = "AMI name pattern"
   type        = string
-  default     = "^al2023-ami-ecs-hvm-2023.0.2026*-kernel-6.1-x86_64"
+  default     = "al2023-ami-ecs-hvm-2023.0.*"
 }
-
 
 variable "ec2_ami_id" {
   description = "Explicit AMI ID (overrides regex lookup if set)"

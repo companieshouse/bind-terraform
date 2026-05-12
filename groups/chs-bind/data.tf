@@ -32,9 +32,8 @@ data "aws_vpc" "management_by_tag" {
   }
 }
 
-data "aws_route53_zone" "chs-bind" {
-  name   = var.dns_zone
-  vpc_id = var.vpc_id
+data "aws_route53_zone" "chs_bind" {
+  name         = "${var.dns_zone}."
   private_zone = true
 }
 
@@ -94,7 +93,7 @@ data "vault_generic_secret" "ami_owner" {
 }
 
 data "vault_generic_secret" "account_ids" {
-  path = "aws-accounts/account-ids"
+  path = "aws-accounts/account-ids/development"
 }
 
 data "vault_generic_secret" "security_s3_buckets" {
@@ -110,9 +109,9 @@ data "vault_generic_secret" "shared_services_s3" {
 }
 
 data "vault_generic_secret" "sns_email" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}"
 }
 
 data "vault_generic_secret" "sns_url" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}"
 }
