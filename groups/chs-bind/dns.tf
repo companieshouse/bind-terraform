@@ -1,9 +1,10 @@
-resource "aws_route53_record" "chs-bind" {
-  count = var.instance_count
+resource "aws_route53_record" "chs_bind" {
+  for_each = aws_instance.bind
 
   zone_id = data.aws_route53_zone.chs_bind.zone_id
-  name    = "${var.service_subtype}-${count.index + 1}"
+  name    = each.value.tags["Name"]
   type    = "A"
   ttl     = 300
-  records = [aws_instance.bind[count.index].private_ip]
+
+  records = [each.value.private_ip]
 }

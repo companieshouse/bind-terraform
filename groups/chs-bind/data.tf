@@ -10,6 +10,12 @@ data "aws_kms_alias" "ebs" {
   name = local.kms_key_alias
 }
 
+data "aws_route53_zone" "chs_bind" {
+  name   = local.dns_zone
+  vpc_id = data.aws_vpc.heritage.id
+}
+
+
 data "vault_generic_secret" "kms_keys" {
   path = "aws-accounts/${var.aws_account}/kms"
 }
@@ -17,64 +23,38 @@ data "vault_generic_secret" "kms_key_alias" {
   path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/kms_key_alias"
 }
 
-data "aws_vpc" "management" {
-  count = var.vpc_id != "" ? 1 : 0
-
+data "aws_vpc" "heritage" {
   id = var.vpc_id
-}
-
-data "aws_vpc" "management_by_tag" {
-  count = var.vpc_id == "" ? 1 : 0
-
-  filter {
-    name   = "tag:Name"
-    values = [var.aws_vpc]
-  }
-}
-
-data "aws_route53_zone" "chs_bind" {
-  name         = "${var.dns_zone}."
-  private_zone = true
 }
 
 data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-data "vault_generic_secret" "ec2_user_ssh_public_key" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/${local.common_resource_name}"
-}
-
-data "aws_subnet" "master" {
-  id = var.subnet_master
-}
-
-data "aws_subnet" "slave" {
-  id = var.subnet_slave
-}
-
+# Discover application subnet IDs
 data "aws_subnets" "application" {
   filter {
     name   = "vpc-id"
-    values = [local.resolved_vpc_id]
+    values = [var.vpc_id]
   }
 
   filter {
-    name   = "subnet-id"
-    values = var.application_subnet_ids
+    name   = "tag:Name"
+    values = [var.application_subnet_pattern]
   }
 }
 
-data "aws_subnet" "by_id" {
-  for_each = toset(var.application_subnet_ids)
-
-  id = each.value
+# Resolve each subnet into a full object (REQUIRED)
+data "aws_subnet" "application" {
+  for_each = toset(data.aws_subnets.application.ids)
+  id       = each.value
 }
 
-data "aws_ami" "al2023" {
+data "aws_ami" "bind_ami" {
   count       = var.ec2_ami_id == "" ? 1 : 0
   most_recent = true
-  owners      = ["591542846629"]
+  owners      = [var.ami_owner_id]
+#  owners      = ["591542846629"]
 
   filter {
     name   = "name"
@@ -88,12 +68,12 @@ data "aws_ami" "al2023" {
 }
 
 data "vault_generic_secret" "ami_owner" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/${var.service_subtype}"
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
   
 }
 
 data "vault_generic_secret" "account_ids" {
-  path = "aws-accounts/account-ids/development"
+  path = "aws-accounts/account-ids/"
 }
 
 data "vault_generic_secret" "security_s3_buckets" {
@@ -108,10 +88,14 @@ data "vault_generic_secret" "shared_services_s3" {
   path = "aws-accounts/shared-services/s3"
 }
 
+data "vault_generic_secret" "ec2_user_ssh_public_key" {
+  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/"
+}
+
 data "vault_generic_secret" "sns_email" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}"
+  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
 }
 
 data "vault_generic_secret" "sns_url" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}"
+  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
 }

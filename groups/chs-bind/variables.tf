@@ -4,20 +4,9 @@ variable "aws_account" {
 }
 
 variable "vpc_id" {
-  type = string
-}
-
-variable "aws_vpc" {
-  description = "VPC ID"
+  description = "VPC ID to deploy resources into"
   type        = string
-}
-
-variable "subnet_master" {
-  type = string
-}
-
-variable "subnet_slave" {
-  type = string
+  default     = ""
 }
 
 variable "aws_region" {
@@ -87,7 +76,7 @@ variable "root_block_device_volume_type" {
 variable "ec2_ami_name_regex" {
   description = "AMI name pattern"
   type        = string
-  default     = "al2023-ami-ecs-hvm-2023.0.*"
+  default     = "al2023-ami-ecs-hvm-2023.0.20260506-kernel-6.1-x86_64"
 }
 
 variable "ec2_ami_id" {
@@ -102,25 +91,32 @@ variable "instance_type" {
   default     = "t3.medium"
 }
 
-variable "security_group_id" {
-  description = "Security group ID for BIND DNS servers"
-  type        = string
-  default     = "sg-0cc299c4828f98b13"
-}
-
 variable "application_subnet_pattern" {
   type        = string
   description = "The pattern to use when filtering for application subnets by 'Name' tag."
 }
 
-variable "dns_zone" {
+variable "dns_zone_suffix" {
   type        = string
-  description = "The DNS hosted zone name for this environment."
+  description = "The common DNS hosted zone suffix used across accounts."
+  default     = "development.aws.internal"
 }
 
 variable "default_log_retention_in_days" {
   type        = number
   description = "The default log retention period in days to be used for CloudWatch log groups."
+}
+
+variable "ami_owner_id" {
+  description = "AWS account ID that owns the AMI"
+  type        = string
+  default = "591542846629"
+}
+
+variable "ec2_ami_name_pattern" {
+  description = "AMI name pattern used to look up the latest AL2023 AMI (wildcards only)"
+  type        = string
+  default     = "al2023-ami-ecs-hvm-2023.0.20260506-kernel-6.1-x86_64"
 }
 
 variable "service" {
@@ -145,12 +141,3 @@ variable "monitoring" {
   default     = false
 }
 
-variable "application_subnet_ids" {
-  description = "List of application subnet IDs"
-  type        = list(string)
-
-  validation {
-    condition     = alltrue([for id in var.application_subnet_ids : can(regex("^subnet-[0-9a-f]+$", id))])
-    error_message = "All subnet IDs must be valid AWS subnet IDs (subnet-xxxxxxxx)."
-  }
-}
