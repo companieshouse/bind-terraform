@@ -120,13 +120,14 @@ locals {
 
 
   #  AMI owner
-locals {
-  ami_owner    = data.vault_generic_secret.ami_owner.data
-}
+#locals {
+#  ami_owner    = data.vault_generic_secret.ami_owner.data
+#}
 
-locals {
-  ami_owner_id = local.ami_owner["ami_owner"]
-}
+#locals {
+#  ami_owner_id = local.ami_owner["ami_owner"]
+#}
+
 locals {
   ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
 }
