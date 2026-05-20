@@ -1,6 +1,4 @@
-########################################
 # Instance Definitions (recommended pattern)
-########################################
 
 locals {
   instances = {
@@ -18,17 +16,13 @@ locals {
   }
 }
 
-#######################################
 # VPC Resolution
-########################################
 
 locals {
   resolved_vpc_id = data.aws_vpc.heritage.id
 }
 
-########################################
 # Subnet Mapping (AZ → subnet_id)
-########################################
 
 locals {
   application_subnets_by_az = {
@@ -37,29 +31,12 @@ locals {
   }
 }
 
-########################################
+
 # AMI Resolution (safe fallback optional)
-########################################
 
 locals {
   ami_id = var.ec2_ami_id != "" ? var.ec2_ami_id : try(data.aws_ami.al2023.id, null)
 }
-
-########################################
-# Vault Secrets (defensive access)
-########################################
-
-#locals {
-#  sns_email_secret = try(
-#    data.vault_generic_secret.sns_email.data,
-#    {}
-#  )
-#
-#  linux_sns_email = try(
-#    local.sns_email_secret["sns_url"],
-#    null
-#  )
-#}
 
 locals {
 dns_zone             = "${var.environment}.${var.dns_zone_suffix}"
@@ -80,10 +57,6 @@ locals {
   }
 }
 
-  ##  AMI selection
-#locals {
-#  ami_id = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.bind_ami[0].id
-#}
 
   #  Vault → S3
 locals {

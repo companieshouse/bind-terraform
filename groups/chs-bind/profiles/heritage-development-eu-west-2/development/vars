@@ -6,7 +6,6 @@ environment = "development"
 dns_zone_suffix    = "heritage.aws.internal."
 origin = "chs-bind-terraform"
 
-# ami_owner_id = "123456789012"
 
 # Instance details
 

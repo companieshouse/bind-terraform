@@ -78,12 +78,6 @@ variable "root_volume_size" {
   default     = 25
 }
 
-variable "dns_zone" {
-  description = "Route53 DNS zone name (must match AWS exactly, including trailing dot)"
-  default     = "development-heritage.aws.internal."
-  type        = string
-}
-
 variable "encrypt_root_block_device" {
   default     = true
   description = "Defines whether the EBS volume should be encrypted with the cluster's KMS key"
@@ -131,11 +125,6 @@ variable "instance_type" {
   description = "The instance type to use for EC2 instances."
   default     = "t3.medium"
 }
-
-#variable "application_subnet_pattern" {
-#  type        = string
-#  description = "The pattern to use when filtering for application subnets by 'Name' tag."
-#}
 
 variable "dns_zone_suffix" {
   type        = string

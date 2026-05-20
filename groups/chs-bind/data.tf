@@ -1,7 +1,4 @@
-
-########################################
 # VPC Lookup
-########################################
 
 data "aws_vpc" "heritage" {
   filter {
@@ -10,9 +7,7 @@ data "aws_vpc" "heritage" {
   }
 }
 
-########################################
 # Subnet Discovery (IDs only)
-########################################
 
 data "aws_subnets" "application" {
   filter {
@@ -26,9 +21,7 @@ data "aws_subnets" "application" {
   }
 }
 
-########################################
 # Subnet Details (FULL objects)
-########################################
 
 data "aws_subnet" "application" {
   for_each = toset(data.aws_subnets.application.ids)
@@ -36,20 +29,7 @@ data "aws_subnet" "application" {
   id = each.value
 }
 
-########################################
 # AMI Lookup (safe)
-########################################
-
-#data "aws_ami" "al2023" {
-#  most_recent = true
-#
-#  owners = [var.ami_owner_id]
-#
-#  filter {
-#    name   = "name"
-#    values = [var.ec2_ami_name_pattern]
-#  }
-#}
 
 data "aws_ami" "al2023" {
   most_recent = true
@@ -101,21 +81,6 @@ data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-#data "aws_ami" "bind_ami" {
-#  most_recent = true
-#  owners      = [var.ami_owner_id]
-#  owners      = ["591542846629"]
-#
-#  filter {
-#    name   = "name"
-#    values = [var.ec2_ami_name_regex]
-#  }
-#
-#  filter {
-#    name   = "state"
-#    values = ["available"]
-#  }
-#}
 
 data "vault_generic_secret" "ami_owner" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"

@@ -3,7 +3,7 @@ resource "aws_route53_record" "chs_bind" {
 
   zone_id = data.aws_route53_zone.chs_bind.zone_id
   
-  name = "${each.key}.${var.dns_zone}"
+  name = "${each.key}.${local.dns_zone}"
   type    = "A"
   ttl     = 300
 

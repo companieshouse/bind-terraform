@@ -5,11 +5,6 @@ resource "aws_instance" "bind" {
   instance_type = each.value.type
   subnet_id     = each.value.subnet_id
 
-  #tags = {
-  #  Name = each.value.name
-  #}
-
-
   key_name = aws_key_pair.bind.key_name
 
   iam_instance_profile = module.instance_profile.aws_iam_instance_profile.name

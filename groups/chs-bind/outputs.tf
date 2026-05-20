@@ -1,7 +1,4 @@
-
-########################################
 # Instance IDs
-########################################
 
 output "instance_ids" {
   description = "Map of instance IDs keyed by instance name"
@@ -11,9 +8,7 @@ output "instance_ids" {
   }
 }
 
-########################################
 # Private IPs
-########################################
 
 output "instance_private_ips" {
   description = "Map of private IPs keyed by instance name"
@@ -23,9 +18,7 @@ output "instance_private_ips" {
   }
 }
 
-########################################
 # Availability Zones
-########################################
 
 output "instance_azs" {
   description = "Map of AZs keyed by instance name"
@@ -35,9 +28,7 @@ output "instance_azs" {
   }
 }
 
-########################################
 # Subnet IDs (resolved)
-########################################
 
 output "instance_subnet_ids" {
   description = "Map of subnet IDs used by each instance"
@@ -47,18 +38,14 @@ output "instance_subnet_ids" {
   }
 }
 
-########################################
 # AMI used
-########################################
 
 output "ami_id" {
   description = "AMI used for all instances"
   value       = local.ami_id
 }
 
-########################################
 # SNS Email (safe)
-########################################
 
 output "sns_email" {
   description = "SNS email/URL from Vault (if available)"
@@ -66,9 +53,7 @@ output "sns_email" {
   sensitive   = true
 }
 
-########################################
 # Subnet Map (AZ → subnet_id)
-########################################
 
 output "application_subnets_by_az" {
   description = "Resolved subnet mapping by AZ"
