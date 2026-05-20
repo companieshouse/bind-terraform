@@ -2,8 +2,13 @@ resource "aws_instance" "bind" {
   for_each = local.instances
 
   ami           = local.ami_id
-  instance_type = var.instance_type
+  instance_type = each.value.type
   subnet_id     = each.value.subnet_id
+
+  #tags = {
+  #  Name = each.value.name
+  #}
+
 
   key_name = aws_key_pair.bind.key_name
 

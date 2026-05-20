@@ -9,6 +9,12 @@ variable "vpc_id" {
   default     = ""
 }
 
+variable "vpc_name" {
+  description = "Name tag of the VPC to look up"
+  type        = string
+  default     = "vpc-heritage-development"
+}
+
 variable "aws_region" {
   type        = string
   description = "The AWS region in which resources will be created."
@@ -31,6 +37,35 @@ variable "ami_version_pattern" {
   default     = "*"
 }
 
+variable "application_subnet_pattern" {
+  description = "Tag value used to filter application subnets"
+  type        = string
+}
+
+variable "instances" {
+  description = "Map of EC2 instances to create"
+  type = map(object({
+    name = string
+    type = string
+    az   = string
+  }))
+
+
+ default = {
+    bind-a = {
+      name = "bind-a"
+      type = "t3.micro"
+      az   = "eu-west-2a"
+    }
+    bind-b = {
+      name = "bind-b"
+      type = "t3.micro"
+      az   = "eu-west-2b"
+    }
+  }
+
+}
+
 variable "instance_count" {
   type        = number
   description = "The number EC2 instances to create."
@@ -41,6 +76,12 @@ variable "root_volume_size" {
   type        = number
   description = "The size of the root volume in gibibytes (GiB)."
   default     = 25
+}
+
+variable "dns_zone" {
+  description = "Route53 DNS zone name (must match AWS exactly, including trailing dot)"
+  default     = "development-heritage.aws.internal."
+  type        = string
 }
 
 variable "encrypt_root_block_device" {
@@ -91,10 +132,10 @@ variable "instance_type" {
   default     = "t3.medium"
 }
 
-variable "application_subnet_pattern" {
-  type        = string
-  description = "The pattern to use when filtering for application subnets by 'Name' tag."
-}
+#variable "application_subnet_pattern" {
+#  type        = string
+#  description = "The pattern to use when filtering for application subnets by 'Name' tag."
+#}
 
 variable "dns_zone_suffix" {
   type        = string

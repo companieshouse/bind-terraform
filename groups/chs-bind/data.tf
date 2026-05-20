@@ -1,3 +1,78 @@
+
+########################################
+# VPC Lookup
+########################################
+
+data "aws_vpc" "heritage" {
+  filter {
+    name   = "tag:Name"
+    values = [var.vpc_name]
+  }
+}
+
+########################################
+# Subnet Discovery (IDs only)
+########################################
+
+data "aws_subnets" "application" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.heritage.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = [var.application_subnet_pattern]
+  }
+}
+
+########################################
+# Subnet Details (FULL objects)
+########################################
+
+data "aws_subnet" "application" {
+  for_each = toset(data.aws_subnets.application.ids)
+
+  id = each.value
+}
+
+########################################
+# AMI Lookup (safe)
+########################################
+
+#data "aws_ami" "al2023" {
+#  most_recent = true
+#
+#  owners = [var.ami_owner_id]
+#
+#  filter {
+#    name   = "name"
+#    values = [var.ec2_ami_name_pattern]
+#  }
+#}
+
+data "aws_ami" "al2023" {
+  most_recent = true
+
+  owners = ["137112412989"] # Amazon
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
+
 data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {
   name = "administration-cidr-ranges"
 }
@@ -15,7 +90,6 @@ data "aws_route53_zone" "chs_bind" {
   vpc_id = data.aws_vpc.heritage.id
 }
 
-
 data "vault_generic_secret" "kms_keys" {
   path = "aws-accounts/${var.aws_account}/kms"
 }
@@ -23,49 +97,25 @@ data "vault_generic_secret" "kms_key_alias" {
   path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/kms_key_alias"
 }
 
-data "aws_vpc" "heritage" {
-  id = var.vpc_id
-}
-
 data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-# Discover application subnet IDs
-data "aws_subnets" "application" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
-
-  filter {
-    name   = "tag:Name"
-    values = [var.application_subnet_pattern]
-  }
-}
-
-# Resolve each subnet into a full object (REQUIRED)
-data "aws_subnet" "application" {
-  for_each = toset(data.aws_subnets.application.ids)
-  id       = each.value
-}
-
-data "aws_ami" "bind_ami" {
-  count       = var.ec2_ami_id == "" ? 1 : 0
-  most_recent = true
-  owners      = [var.ami_owner_id]
+#data "aws_ami" "bind_ami" {
+#  most_recent = true
+#  owners      = [var.ami_owner_id]
 #  owners      = ["591542846629"]
-
-  filter {
-    name   = "name"
-    values = [var.ec2_ami_name_regex]
-  }
-
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
+#
+#  filter {
+#    name   = "name"
+#    values = [var.ec2_ami_name_regex]
+#  }
+#
+#  filter {
+#    name   = "state"
+#    values = ["available"]
+#  }
+#}
 
 data "vault_generic_secret" "ami_owner" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
