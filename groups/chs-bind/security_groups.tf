@@ -33,9 +33,9 @@ resource "aws_vpc_security_group_ingress_rule" "bind_dns_tcp" {
 
   security_group_id = aws_security_group.bind.id
 
-  cidr_ipv4  = each.value.cidr_block
-  from_port  = 53
-  to_port    = 53
+  cidr_ipv4   = each.value.cidr_block
+  from_port   = 53
+  to_port     = 53
   ip_protocol = "tcp"
 }
 
@@ -45,9 +45,9 @@ resource "aws_vpc_security_group_ingress_rule" "bind_dns_udp" {
 
   security_group_id = aws_security_group.bind.id
 
-  cidr_ipv4  = each.value.cidr_block
-  from_port  = 53
-  to_port    = 53
+  cidr_ipv4   = each.value.cidr_block
+  from_port   = 53
+  to_port     = 53
   ip_protocol = "udp"
 }
 

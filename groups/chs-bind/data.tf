@@ -84,7 +84,7 @@ data "vault_generic_secret" "internal_cidrs" {
 
 data "vault_generic_secret" "ami_owner" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
-  
+
 }
 
 data "vault_generic_secret" "account_ids" {
