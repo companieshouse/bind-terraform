@@ -49,7 +49,7 @@ output "ami_id" {
 
 output "sns_email" {
   description = "SNS email/URL from Vault (if available)"
-  value       = local.linux_sns_email
+  value       = local.sns_email
   sensitive   = true
 }
 
@@ -59,4 +59,3 @@ output "application_subnets_by_az" {
   description = "Resolved subnet mapping by AZ"
   value       = local.application_subnets_by_az
 }
-

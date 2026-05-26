@@ -30,6 +30,6 @@ resource "aws_instance" "bind" {
 }
 
 resource "aws_key_pair" "bind" {
-  key_name   = "${local.common_resource_name}-public-key"
+  key_name   = "${local.common_resource_name}"
   public_key = local.ssh_public_key
 }

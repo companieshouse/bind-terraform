@@ -52,7 +52,6 @@ data "aws_ami" "al2023" {
   }
 }
 
-
 data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {
   name = "administration-cidr-ranges"
 }
@@ -73,6 +72,7 @@ data "aws_route53_zone" "chs_bind" {
 data "vault_generic_secret" "kms_keys" {
   path = "aws-accounts/${var.aws_account}/kms"
 }
+
 data "vault_generic_secret" "kms_key_alias" {
   path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/kms_key_alias"
 }
@@ -81,14 +81,12 @@ data "vault_generic_secret" "internal_cidrs" {
   path = "aws-accounts/network/internal_cidr_ranges"
 }
 
-
 data "vault_generic_secret" "ami_owner" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
-
 }
 
 data "vault_generic_secret" "account_ids" {
-  path = "aws-accounts/account-ids/"
+  path = "aws-accounts/account-ids"
 }
 
 data "vault_generic_secret" "security_s3_buckets" {
@@ -107,10 +105,6 @@ data "vault_generic_secret" "ec2_user_ssh_public_key" {
   path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/"
 }
 
-data "vault_generic_secret" "sns_email" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
-}
-
-data "vault_generic_secret" "sns_url" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
+data "vault_generic_secret" "sns" {
+  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns"
 }

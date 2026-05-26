@@ -16,6 +16,5 @@ terraform {
 }
 
 provider "aws" {
-  alias  = "dns"
   region = var.aws_region
 }

@@ -73,4 +73,3 @@ resource "aws_cloudwatch_metric_alarm" "bind_server_root_disk_space" {
     fstype       = local.disk_info.root_vol.fstype
   }
 }
-

@@ -2,18 +2,17 @@
 
 locals {
   instances = {
-   for name, cfg in var.instances :
+    for name, cfg in var.instances :
     name => merge(cfg, {
       subnet_id = local.application_subnets_by_az[cfg.az]
     })
   }
 
 
-# VPC Resolution
+  # VPC Resolution
   resolved_vpc_id = data.aws_vpc.heritage.id
 
-# Subnet Mapping (AZ → subnet_id)
-
+  # Subnet Mapping (AZ → subnet_id)
 
   application_subnets_by_az = {
     for subnet_id, subnet in data.aws_subnet.application :
@@ -21,17 +20,17 @@ locals {
   }
 
 
-# AMI Resolution (safe fallback optional)
+  # AMI Resolution (safe fallback optional)
 
   ami_id = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.al2023.id
 
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
 
 
-#  Naming
+  #  Naming
   common_resource_name = "${var.environment}-${var.service_subtype}"
 
-#  Common tags
+  #  Common tags
   common_tags = {
     Environment    = var.environment
     Service        = var.service
@@ -39,7 +38,7 @@ locals {
     Team           = var.team
   }
 
-#  Vault → S3
+  #  Vault → S3
 
   security_s3_data = data.vault_generic_secret.security_s3_buckets.data
 
@@ -49,7 +48,7 @@ locals {
 
   resources_bucket_name = local.shared_services_s3_data["resources_bucket_name"]
 
-#  Vault → KMS
+  #  Vault → KMS
 
   security_kms_keys_data = data.vault_generic_secret.security_kms_keys.data
 
@@ -59,33 +58,25 @@ locals {
 
   cloudwatch_logs_kms_key = local.kms_keys["logs"]
 
-#  Account IDs
+  #  Account IDs
 
   account_ids_secrets = jsondecode(data.vault_generic_secret.account_ids.data_json)
 
   bind_ami_owner_id = local.account_ids_secrets["heritage-development"]
 
-#  KMS alias
+  #  KMS alias
 
   kms_key = data.vault_generic_secret.kms_key_alias.data
 
-  kms_key_alias = local.kms_key["kms_key_alias"]
+  kms_key_alias = data.vault_generic_secret.kms_key_alias.data["kms_key_alias"]
 
-#  SNS email
-
-  sns_email_secret = data.vault_generic_secret.sns_email.data
-
-  linux_sns_email = local.sns_email_secret["linux_email"]
-
-#  AMI owner
-
-#  ami_owner    = data.vault_generic_secret.ami_owner.data
-
-#  ami_owner_id = local.ami_owner["ami_owner"]
+  #  SNS email
+  sns_email = data.vault_generic_secret.sns.data["linux_email"]
+  sns_url = data.vault_generic_secret.sns.data["linux_url"]
 
   ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
 
-#  Disk config
+  #  Disk config
 
   disk_info = {
     root_vol = {

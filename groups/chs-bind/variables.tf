@@ -3,16 +3,9 @@ variable "aws_account" {
   description = "The name of the AWS account in which resources will be provisioned."
 }
 
-variable "vpc_id" {
-  description = "VPC ID to deploy resources into"
-  type        = string
-  default     = ""
-}
-
 variable "vpc_name" {
   description = "Name tag of the VPC to look up"
   type        = string
-  default     = "vpc-heritage-development"
 }
 
 variable "aws_region" {
@@ -49,8 +42,6 @@ variable "instances" {
     type = string
     az   = string
   }))
-
-
   default = {
     bind-a = {
       name = "bind-a"
@@ -152,4 +143,3 @@ variable "monitoring" {
   description = "Variable to determine is monitoring is enabled"
   default     = false
 }
-
