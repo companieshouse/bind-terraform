@@ -1,4 +1,5 @@
 # Mac files
+.terraform
 .DS_Store
 ._*
 .ansible*
