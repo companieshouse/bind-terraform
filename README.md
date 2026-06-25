@@ -1,359 +1,106 @@
-# Bind CHS 
-
-README.md
-
-
-# CHS-BIND DNS Platform
-
-This repository provisions and configures **BIND DNS servers** for Companies House infrastructure using:
-
--  Terraform (infrastructure provisioning)
--  Ansible (configuration management)
--  S3 (authoritative zone storage)
--  Concourse CI (deployment pipeline)
-
-The platform is designed for:
-
-- High availability (master/slave architecture)
-- Idempotent configuration
-- CI/CD-driven operations
-- Centralised DNS zone management
-- Auditability and change tracking
-
-
-
-# Architecture Overview
-
-
-
-Terraform → AWS EC2 + Route53 + IAM
-↓
-Ansible → Configure BIND service
-↓
-S3 → Zone file distribution
-↓
-Master → Slave replication (AXFR)
-
-
-
----
-
-#Repository Structure
-
-
-
-ansible/
-├── playbooks/
-│   └── site.yml
-├── inventories/
-│   └── <environment>/
-├── roles/
-│   ├── bind\_install/
-│   ├── bind\_configure/
-│   ├── bind\_zones/
-│   └── bind\_service/
-├── group\_vars/
-│   └── bind.yml
-
-
-
----
-
-# Deployment Flow
-
-## Step 1: Provision Infrastructure (Terraform)
-
-- EC2 instances (BIND servers)
-- Security groups
-- IAM instance profiles
-- Route53 records
-
-bash
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
-
-
-***
-
-## Step 2: Configure Servers (Ansible)
-
-bash
-ansible-playbook \
-  -i inventories/<env>/hosts.yml \
-  playbooks/site.yml
-
-
-***
-
-# Ansible Role Breakdown
-
-***
-
-## 1. Role: `bind_install`
-
-### Purpose
-
-Installs BIND packages and manages service lifecycle.
-
-### Responsibilities
-
-* Install `bind` and `bind-utils`
-* Enable and start `named`
-
-### Behaviour
-
-* Idempotent
-* OS-compatible (Amazon Linux / RHEL)
-
-***
-
-## 2. Role: `bind_configure`
-
-### Purpose
-
-Configures core BIND service (`named.conf`).
-
-### Responsibilities
-
-* Configure master / slave roles
-* Define listen interfaces
-* Configure ACLs (query / transfer)
-* Apply security policies
-
-### Key Variables
-
-yaml
-bind_configure_role: master | slave
-
-bind_configure_allow_query:
-  - any
-
-bind_configure_allow_transfer:
-  - 10.0.1.10
-
-bind_configure_masters:
-  - 10.0.1.10
-
-
-### Features
-
-* Master/slave behaviour enforcement
-* Secure zone transfers
-* Config validation (`named-checkconf`)
-
-***
-
-## 3. Role: `bind_zones`
-
-### Purpose
-
-Manages DNS zone files and ensures they are valid and synchronised.
-
-### Responsibilities
-
-* Sync zone files from S3
-* Validate zone files
-* Reload BIND service safely
-
-***
-
-### Source of Truth
-
-**S3 is the authoritative source of zone files**
-
-
-s3://<bind_zone_bucket>/zones/
-
-
-***
-
-### Key Tasks
-
-#### Sync zones
-
-yaml
-aws s3 sync s3://<bucket>/zones/ /var/named/
-
-
-#### Validate zones
-
-bash
-named-checkzone <zone> <zonefile>
-
-
-***
-
-### Key Variables
-
-yaml
-bind_zones_zone_bucket: chs-bind-zones
-bind_zones_zone_prefix: zones
-bind_zones:
-  - zone: example.internal
-    file: example.internal.zone
-
-
-***
-
-## 4. Role: `bind_service`
-
-### Purpose
-
-Manages DNS records dynamically at the **service level**, enabling automation of:
-
-* A records
-* CNAME records
-* PTR records
-* SRV records
-
-***
-
-### Responsibilities
-
-* Create/update/delete DNS records
-* Validate record structure
-* Maintain audit trail (optional extension)
-* Ensure idempotency
-
-***
-
-### Example Input
-
-yaml
-bind_service_records:
-  - name: api
-    zone: example.internal
-    type: A
-    value: 10.0.10.5
-    state: present
-    owner: platform
-
-  - name: db
-    zone: example.internal
-    type: CNAME
-    value: db.internal
-    state: present
-
-
-***
-
-### Supported Record Types
-
-| Type  | Supported |
-| ----- | --------- |
-| A     | ✅         |
-| AAAA  | ✅         |
-| CNAME | ✅         |
-| PTR   | ✅         |
-| SRV   | ✅         |
-
-***
-
-### Features
-
-* Record validation
-* Idempotent updates
-* Record removal support
-* Extensible for audit logging
-
-***
-
-# Master / Slave Behaviour
-
-| Role        | Behaviour               |
-| ----------- | ----------------------- |
-| Master      | Pulls zones from S3     |
-| Slave       | Receives zones via AXFR |
-| Zones       | Stored centrally        |
-| Replication | DNS zone transfer       |
-
-***
-
-# Security Model
-
-* IAM roles used for S3 access
-* No static credentials on instances
-* Zone transfers restricted via ACL
-* DNS recursion disabled by default
-* SSM preferred over SSH
-
-***
-
-# DNS Flow
-
-
-Client → Route53 → BIND EC2 → Zone response
-
-
-***
-
-# Validation & Testing
-
-## Validate configuration
-
-bash
-named-checkconf
-
-
-## Validate zones
-
-bash
-named-checkzone example.internal /var/named/example.internal.zone
-
-
-## Query DNS
-
-bash
-dig @<bind-server-ip> example.internal
-
-
-***
-
-# CI/CD Pipeline Integration
-
-Pipeline stages:
-
-
-1. Git push
-2. Release (versioning)
-3. Terraform plan
-4. Terraform apply
-5. Ansible deploy
-6. DNS available
-
-
-***
-
-#  Requirements
-
-* Ansible ≥ 2.15
-* AWS CLI installed on target hosts
-* IAM role with S3 read access
-* BIND packages available via OS repository
-
-***
-
-# Design Principles
-
-* Single source of truth (S3 for zones)
-* Separation of concerns (roles)
-* Idempotency
-* Infrastructure as Code
-* CI/CD driven deployment
-* Lint-clean Ansible roles
-
-
-This platform provides a **scalable, secure, and fully automated DNS solution** using:
-
-* Terraform → infrastructure
-* Ansible → configuration
-* S3 → zone data
-* CI/CD → deployment
-
-***
-
-Terraform provisions servers
-Ansible configures BIND
-S3 provides zone data
-BIND serves DNS
+# chs-bind - heritage dev/test server
+Terraform for provisioning bind servers
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.37.0, < 6.0.0 |
+| <a name="requirement_vault"></a> [vault](#requirement\_vault) | >= 3.25.0, < 5.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.37.0, < 6.0.0 |
+| <a name="provider_vault"></a> [vault](#provider\_vault) | >= 3.25.0, < 5.0.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_instance_profile"></a> [instance\_profile](#module\_instance\_profile) | git@github.com:companieshouse/terraform-modules//aws/instance_profile | tags/1.0.283 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_cloudwatch_log_group.bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cloudwatch_metric_alarm.bind_server_StatusCheckFailed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.bind_server_cpu95](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.bind_server_root_disk_space](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_instance.bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_key_pair.bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
+| [aws_route53_record.chs_bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_security_group.bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_sns_topic.bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.bind_system_Subscription](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription) | resource |
+| [aws_sns_topic_subscription.bind_system_Subscriptionhttps](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription) | resource |
+| [aws_vpc_security_group_egress_rule.bind_all_out](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.bind_dns_tcp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.bind_dns_udp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.bind_ssh_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.bind_ssh_shared_services](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_ami.al2023](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ec2_managed_prefix_list.administration_cidr_ranges](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_managed_prefix_list) | data source |
+| [aws_ec2_managed_prefix_list.shared_services_cidr_ranges](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_managed_prefix_list) | data source |
+| [aws_kms_alias.ebs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_alias) | data source |
+| [aws_route53_zone.chs_bind](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
+| [aws_subnet.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
+| [aws_subnets.application](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
+| [aws_vpc.heritage](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
+| [vault_generic_secret.account_ids](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.ami_owner](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.ec2_user_ssh_public_key](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.internal_cidrs](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.kms_key_alias](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.kms_keys](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.security_kms_keys](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.security_s3_buckets](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.shared_services_s3](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+| [vault_generic_secret.sns](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/generic_secret) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_ami_version_pattern"></a> [ami\_version\_pattern](#input\_ami\_version\_pattern) | The pattern to use when filtering for AMI version by name. | `string` | `"*"` | no |
+| <a name="input_application_subnet_pattern"></a> [application\_subnet\_pattern](#input\_application\_subnet\_pattern) | Tag value used to filter application subnets | `string` | n/a | yes |
+| <a name="input_aws_account"></a> [aws\_account](#input\_aws\_account) | The name of the AWS account in which resources will be provisioned. | `string` | n/a | yes |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region in which resources will be created. | `string` | n/a | yes |
+| <a name="input_default_log_retention_in_days"></a> [default\_log\_retention\_in\_days](#input\_default\_log\_retention\_in\_days) | The default log retention period in days to be used for CloudWatch log groups. | `number` | n/a | yes |
+| <a name="input_disk_fs_type"></a> [disk\_fs\_type](#input\_disk\_fs\_type) | Default filesytem type for root/ebs block devices | `string` | `"xfs"` | no |
+| <a name="input_dns_zone_suffix"></a> [dns\_zone\_suffix](#input\_dns\_zone\_suffix) | The common DNS hosted zone suffix used across accounts. | `string` | n/a | yes |
+| <a name="input_ec2_ami_id"></a> [ec2\_ami\_id](#input\_ec2\_ami\_id) | Explicit AMI ID (overrides regex lookup if set) | `string` | `""` | no |
+| <a name="input_encrypt_root_block_device"></a> [encrypt\_root\_block\_device](#input\_encrypt\_root\_block\_device) | Defines whether the EBS volume should be encrypted with the cluster's KMS key | `bool` | `true` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | The environment name to be used when provisioning AWS resources. | `string` | n/a | yes |
+| <a name="input_hashicorp_vault_password"></a> [hashicorp\_vault\_password](#input\_hashicorp\_vault\_password) | The password used when retrieving configuration from Hashicorp Vault | `string` | n/a | yes |
+| <a name="input_hashicorp_vault_username"></a> [hashicorp\_vault\_username](#input\_hashicorp\_vault\_username) | The username used when retrieving configuration from Hashicorp Vault | `string` | n/a | yes |
+| <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | The number EC2 instances to create. | `number` | `1` | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | The instance type to use for EC2 instances. | `string` | `"t3.medium"` | no |
+| <a name="input_instances"></a> [instances](#input\_instances) | Map of EC2 instances to create | <pre>map(object({<br/>    name = string<br/>    type = string<br/>    az   = string<br/>  }))</pre> | <pre>{<br/>  "bind-a": {<br/>    "az": "eu-west-2a",<br/>    "name": "bind-a",<br/>    "type": "t3.micro"<br/>  },<br/>  "bind-b": {<br/>    "az": "eu-west-2b",<br/>    "name": "bind-b",<br/>    "type": "t3.micro"<br/>  }<br/>}</pre> | no |
+| <a name="input_monitoring"></a> [monitoring](#input\_monitoring) | Variable to determine is monitoring is enabled | `bool` | `false` | no |
+| <a name="input_origin"></a> [origin](#input\_origin) | Github Repository where instance code resides | `string` | `"chs-bind-terraform"` | no |
+| <a name="input_root_block_device_iops"></a> [root\_block\_device\_iops](#input\_root\_block\_device\_iops) | The required IOPS on the EBS volume; 3000 is the gp3 default | `number` | `3000` | no |
+| <a name="input_root_block_device_throughput"></a> [root\_block\_device\_throughput](#input\_root\_block\_device\_throughput) | The required EBS volume throughput in MiB/s; 125 is the gp3 default | `number` | `125` | no |
+| <a name="input_root_block_device_volume_type"></a> [root\_block\_device\_volume\_type](#input\_root\_block\_device\_volume\_type) | The type of EBS volume to provision | `string` | `"gp3"` | no |
+| <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | The size of the root volume in gibibytes (GiB). | `number` | `25` | no |
+| <a name="input_service"></a> [service](#input\_service) | The service name to be used when creating AWS resources. | `string` | n/a | yes |
+| <a name="input_service_subtype"></a> [service\_subtype](#input\_service\_subtype) | The service subtype name to be used when creating AWS resources. | `string` | n/a | yes |
+| <a name="input_team"></a> [team](#input\_team) | The team name for ownership of this service. | `string` | `"Linux/Storage"` | no |
+| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name tag of the VPC to look up | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_ami_id"></a> [ami\_id](#output\_ami\_id) | AMI used for all instances |
+| <a name="output_application_subnets_by_az"></a> [application\_subnets\_by\_az](#output\_application\_subnets\_by\_az) | Resolved subnet mapping by AZ |
+| <a name="output_instance_azs"></a> [instance\_azs](#output\_instance\_azs) | Map of AZs keyed by instance name |
+| <a name="output_instance_ids"></a> [instance\_ids](#output\_instance\_ids) | Map of instance IDs keyed by instance name |
+| <a name="output_instance_private_ips"></a> [instance\_private\_ips](#output\_instance\_private\_ips) | Map of private IPs keyed by instance name |
+| <a name="output_instance_subnet_ids"></a> [instance\_subnet\_ids](#output\_instance\_subnet\_ids) | Map of subnet IDs used by each instance |
+| <a name="output_sns_email"></a> [sns\_email](#output\_sns\_email) | SNS email/URL from Vault (if available) |
+<!-- END_TF_DOCS -->
