@@ -21,7 +21,6 @@ variable "environment" {
 variable "origin" {
   type        = string
   description = "Github Repository where instance code resides"
-  default     = "chs-bind-terraform"
 }
 
 variable "ami_version_pattern" {

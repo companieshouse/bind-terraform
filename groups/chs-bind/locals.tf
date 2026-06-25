@@ -72,7 +72,7 @@ locals {
 
   #  SNS email
   sns_email = data.vault_generic_secret.sns.data["linux_email"]
-  sns_url = data.vault_generic_secret.sns.data["linux_url"]
+  sns_url   = data.vault_generic_secret.sns.data["linux_url"]
 
   ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
 

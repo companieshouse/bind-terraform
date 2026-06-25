@@ -1,16 +1,18 @@
 resource "aws_instance" "bind" {
   for_each = local.instances
 
-  ami           = local.ami_id
-  instance_type = each.value.type
-  subnet_id     = each.value.subnet_id
-
-  key_name = aws_key_pair.bind.key_name
-
+  ami                  = local.ami_id
+  instance_type        = each.value.type
+  subnet_id            = each.value.subnet_id
+  key_name             = aws_key_pair.bind.key_name
   iam_instance_profile = module.instance_profile.aws_iam_instance_profile.name
   vpc_security_group_ids = [
     aws_security_group.bind.id
   ]
+
+  metadata_options {
+    http_tokens = "required"
+  }
 
   tags = merge(local.common_tags, {
     Name       = each.value.name
