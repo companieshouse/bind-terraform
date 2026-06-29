@@ -102,5 +102,5 @@ data "vault_generic_secret" "ec2_user_ssh_public_key" {
 }
 
 data "vault_generic_secret" "sns" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns"
+  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
 }
