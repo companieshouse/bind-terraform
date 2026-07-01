@@ -17,7 +17,7 @@ resource "aws_instance" "bind" {
   tags = merge(local.common_tags, {
     Name       = each.value.name
     Backup     = true
-    Zone       = var.dns_zone_suffix
+    Zone       = local.dns_zone
     Repository = var.origin
   })
 
