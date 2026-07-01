@@ -1,5 +1,4 @@
 # Instance Definitions (recommended pattern)
-
 locals {
   instances = {
     for name, cfg in var.instances :
@@ -7,7 +6,6 @@ locals {
       subnet_id = local.application_subnets_by_az[cfg.az]
     })
   }
-
 
   # VPC Resolution
   resolved_vpc_id = data.aws_vpc.heritage.id
@@ -19,13 +17,10 @@ locals {
     subnet.availability_zone => subnet.id
   }
 
-
   # AMI Resolution (safe fallback optional)
 
-  ami_id = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.al2023.id
-
+  ami_id   = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.al2023.id
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
-
 
   #  Naming
   common_resource_name = "${var.environment}-${var.service_subtype}"

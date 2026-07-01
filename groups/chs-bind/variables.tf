@@ -113,7 +113,6 @@ variable "instance_type" {
 variable "dns_zone_suffix" {
   type        = string
   description = "The common DNS hosted zone suffix used across accounts."
-  #  default     = "development.aws.internal"
 }
 
 variable "default_log_retention_in_days" {
