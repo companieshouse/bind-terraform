@@ -66,7 +66,6 @@ locals {
 
   #  KMS alias
 
-  kms_key = data.vault_generic_secret.kms_key_alias.data
 
   kms_key_alias = data.vault_generic_secret.kms_key_alias.data["kms_key_alias"]
 
