@@ -23,7 +23,7 @@ locals {
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
 
   #  Naming
-  common_resource_name = "${var.environment}-${var.service}-${var.service_subtype}"
+  common_resource_name = "${var.environment}-${var.service_subtype}"
 
   #  Common tags
   common_tags = {
