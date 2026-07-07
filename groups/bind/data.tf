@@ -64,7 +64,7 @@ data "aws_kms_alias" "ebs" {
   name = local.kms_key_alias
 }
 
-data "aws_route53_zone" "chs_bind" {
+data "aws_route53_zone" "bind" {
   name   = local.dns_zone
   vpc_id = data.aws_vpc.heritage.id
 }

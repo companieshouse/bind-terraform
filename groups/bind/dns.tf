@@ -1,7 +1,7 @@
-resource "aws_route53_record" "chs_bind" {
+resource "aws_route53_record" "bind" {
   for_each = aws_instance.bind
 
-  zone_id = data.aws_route53_zone.chs_bind.zone_id
+  zone_id = data.aws_route53_zone.bind.zone_id
 
   name = "${each.key}.${local.dns_zone}"
   type = "A"

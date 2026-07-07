@@ -3,7 +3,7 @@ aws_account = "heritage-development"
 aws_region  = "eu-west-2"
 environment = "development"
 dns_zone_suffix = "heritage.aws.internal."
-origin = "chs-bind-terraform"
+origin = "bind-terraform"
 vpc_name = "vpc-heritage-development"
 
 # Instance details

@@ -23,7 +23,7 @@ locals {
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
 
   #  Naming
-  common_resource_name = "${var.environment}-${var.service_subtype}"
+  common_resource_name = "${var.environment}-${var.service}-${var.service_subtype}"
 
   #  Common tags
   common_tags = {
@@ -57,7 +57,7 @@ locals {
 
   account_ids_secrets = jsondecode(data.vault_generic_secret.account_ids.data_json)
 
-  bind_ami_owner_id = local.account_ids_secrets["heritage-development"]
+  bind_ami_owner_id = local.account_ids_secrets["development"]
 
   #  KMS alias
 
