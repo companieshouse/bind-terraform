@@ -1,7 +1,7 @@
 resource "aws_security_group" "bind" {
   name        = local.common_resource_name
   description = "Security group for the ${var.service_subtype} EC2 instances"
-  vpc_id      = data.aws_vpc.this.id
+  vpc_id      = data.aws_vpc.heritage.id
 
   tags = merge(local.common_tags, {
     Name = "${local.common_resource_name}"
@@ -27,19 +27,28 @@ resource "aws_vpc_security_group_ingress_rule" "bind_ssh_shared_services" {
   to_port           = 22
 }
 
-# SMTP connectivity with other servers
-resource "aws_vpc_security_group_ingress_rule" "bind_smtp" {
-  for_each = {
-    for id, subnet in data.aws_subnet.application :
-    id => subnet.cidr_block
-  }
+# TCP DNS (port 53)
+resource "aws_vpc_security_group_ingress_rule" "bind_dns_tcp" {
+  for_each = data.aws_subnet.application
 
-  description       = "Allow SMTP over the app subnet(s) ${each.key}"
   security_group_id = aws_security_group.bind.id
-  cidr_ipv4         = each.value
-  ip_protocol       = "tcp"
-  from_port         = 25
-  to_port           = 25
+
+  cidr_ipv4   = each.value.cidr_block
+  from_port   = 53
+  to_port     = 53
+  ip_protocol = "tcp"
+}
+
+# UDP DNS (port 53)
+resource "aws_vpc_security_group_ingress_rule" "bind_dns_udp" {
+  for_each = data.aws_subnet.application
+
+  security_group_id = aws_security_group.bind.id
+
+  cidr_ipv4   = each.value.cidr_block
+  from_port   = 53
+  to_port     = 53
+  ip_protocol = "udp"
 }
 
 # Egress

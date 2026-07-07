@@ -3,6 +3,11 @@ variable "aws_account" {
   description = "The name of the AWS account in which resources will be provisioned."
 }
 
+variable "vpc_name" {
+  description = "Name tag of the VPC to look up"
+  type        = string
+}
+
 variable "aws_region" {
   type        = string
   description = "The AWS region in which resources will be created."
@@ -16,13 +21,39 @@ variable "environment" {
 variable "origin" {
   type        = string
   description = "Github Repository where instance code resides"
-  default     = "chs-bind-terraform"
 }
 
 variable "ami_version_pattern" {
   type        = string
   description = "The pattern to use when filtering for AMI version by name."
   default     = "*"
+}
+
+variable "application_subnet_pattern" {
+  description = "Tag value used to filter application subnets"
+  type        = string
+}
+
+variable "instances" {
+  description = "Map of EC2 instances to create"
+  type = map(object({
+    name = string
+    type = string
+    az   = string
+  }))
+  default = {
+    bind-a = {
+      name = "bind-a"
+      type = "t3.micro"
+      az   = "eu-west-2a"
+    }
+    bind-b = {
+      name = "bind-b"
+      type = "t3.micro"
+      az   = "eu-west-2b"
+    }
+  }
+
 }
 
 variable "instance_count" {
@@ -67,20 +98,21 @@ variable "root_block_device_volume_type" {
   type        = string
 }
 
+variable "ec2_ami_id" {
+  description = "Explicit AMI ID (overrides regex lookup if set)"
+  type        = string
+  default     = ""
+}
+
 variable "instance_type" {
   type        = string
   description = "The instance type to use for EC2 instances."
   default     = "t3.medium"
 }
 
-variable "application_subnet_pattern" {
+variable "dns_zone_suffix" {
   type        = string
-  description = "The pattern to use when filtering for application subnets by 'Name' tag."
-}
-
-variable "dns_zone" {
-  type        = string
-  description = "The DNS hosted zone name for this environment."
+  description = "The common DNS hosted zone suffix used across accounts."
 }
 
 variable "default_log_retention_in_days" {
