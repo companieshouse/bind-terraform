@@ -33,11 +33,14 @@ data "aws_subnet" "application" {
 data "aws_ami" "amzn2023_base" {
   most_recent = true
 
-  owners = ["416670754337"]
+  filter {
+    name   = "owner-id"
+    values = ["${local.ami_owner_id}"]
+  }
 
   filter {
     name   = "name"
-    values = ["amzn2023-base-*"]
+    values = ["amzn2023-base-1*"]
   }
 }
 

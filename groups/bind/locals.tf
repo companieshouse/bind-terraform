@@ -56,7 +56,9 @@ locals {
 
   account_ids_secrets = jsondecode(data.vault_generic_secret.account_ids.data_json)
 
-  bind_ami_owner_id = local.account_ids_secrets["development"]
+  #  bind_ami_owner_id = local.account_ids_secrets["development"]
+  ami_owner    = data.vault_generic_secret.ami_owner.data
+  ami_owner_id = local.ami_owner["ami_owner"]
 
   #  KMS alias
 
