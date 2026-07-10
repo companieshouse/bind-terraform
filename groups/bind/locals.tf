@@ -18,8 +18,7 @@ locals {
   }
 
   # AMI Resolution (safe fallback optional)
-
-  ami_id   = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.al2023.id
+  ami_used = data.aws_ami.amzn2023_base.id
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
 
   #  Naming

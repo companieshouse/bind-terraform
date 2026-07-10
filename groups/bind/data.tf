@@ -30,25 +30,14 @@ data "aws_subnet" "application" {
 }
 
 # AMI Lookup (safe)
-
-data "aws_ami" "al2023" {
+data "aws_ami" "amzn2023_base" {
   most_recent = true
 
-  owners = ["137112412989"] # Amazon
+  owners = ["416670754337"]
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023.*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
+    values = ["amzn2023-base-*"]
   }
 }
 
