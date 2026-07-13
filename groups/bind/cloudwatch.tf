@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "bind_server_cpu95" {
   alarm_actions             = [aws_sns_topic.bind[0].arn]
   ok_actions                = [aws_sns_topic.bind[0].arn]
   dimensions = {
-    InstanceId = aws_instance.bind[count.index].id
+    InstanceId = aws_instance.bind-ns[count.index].id
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "bind_server_StatusCheckFailed" {
   alarm_actions             = [aws_sns_topic.bind[0].arn]
   ok_actions                = [aws_sns_topic.bind[0].arn]
   dimensions = {
-    InstanceId = aws_instance.bind[count.index].id
+    InstanceId = aws_instance.bind-ns[count.index].id
   }
 }
 
@@ -66,8 +66,8 @@ resource "aws_cloudwatch_metric_alarm" "bind_server_root_disk_space" {
   ok_actions          = [aws_sns_topic.bind[0].arn]
   dimensions = {
     path         = local.disk_info.root_vol.path
-    InstanceId   = aws_instance.bind[count.index].id
-    ImageId      = local.ami_id
+    InstanceId   = aws_instance.bind-ns[count.index].id
+    ImageId      = data.aws_ami.amzn2023_base.id
     InstanceType = var.instance_type
     device       = local.disk_info.root_vol.device
     fstype       = local.disk_info.root_vol.fstype

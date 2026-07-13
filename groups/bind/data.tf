@@ -30,26 +30,20 @@ data "aws_subnet" "application" {
 }
 
 # AMI Lookup (safe)
-
-data "aws_ami" "al2023" {
+data "aws_ami" "amzn2023_base" {
   most_recent = true
 
-  owners = ["137112412989"] # Amazon
+  filter {
+    name   = "owner-id"
+    values = [local.ami_owner_id]
+  }
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023.*-x86_64"]
+    values = ["amzn2023-base-*"]
   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+  name_regex = "^amzn2023-base-[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+)?$"
 }
 
 data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {

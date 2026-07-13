@@ -18,8 +18,7 @@ locals {
   }
 
   # AMI Resolution (safe fallback optional)
-
-  ami_id   = var.ec2_ami_id != "" ? var.ec2_ami_id : data.aws_ami.al2023.id
+  ami_used = data.aws_ami.amzn2023_base.id
   dns_zone = "${var.environment}.${var.dns_zone_suffix}"
 
   #  Naming
@@ -57,7 +56,9 @@ locals {
 
   account_ids_secrets = jsondecode(data.vault_generic_secret.account_ids.data_json)
 
-  bind_ami_owner_id = local.account_ids_secrets["development"]
+  #  bind_ami_owner_id = local.account_ids_secrets["development"]
+  ami_owner    = data.vault_generic_secret.ami_owner.data
+  ami_owner_id = local.ami_owner["ami_owner"]
 
   #  KMS alias
 

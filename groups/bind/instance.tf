@@ -1,7 +1,8 @@
-resource "aws_instance" "bind" {
+resource "aws_instance" "bind-ns" {
   for_each = local.instances
 
-  ami                  = local.ami_id
+  #  ami                  = local.ami_id
+  ami                  = data.aws_ami.amzn2023_base.id
   instance_type        = each.value.type
   subnet_id            = each.value.subnet_id
   key_name             = aws_key_pair.bind.key_name

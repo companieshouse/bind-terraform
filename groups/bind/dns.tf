@@ -1,5 +1,5 @@
 resource "aws_route53_record" "bind" {
-  for_each = aws_instance.bind
+  for_each = aws_instance.bind-ns
 
   zone_id = data.aws_route53_zone.bind.zone_id
 

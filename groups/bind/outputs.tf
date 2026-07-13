@@ -3,7 +3,7 @@
 output "instance_ids" {
   description = "Map of instance IDs keyed by instance name"
   value = {
-    for name, instance in aws_instance.bind :
+    for name, instance in aws_instance.bind-ns :
     name => instance.id
   }
 }
@@ -13,7 +13,7 @@ output "instance_ids" {
 output "instance_private_ips" {
   description = "Map of private IPs keyed by instance name"
   value = {
-    for name, instance in aws_instance.bind :
+    for name, instance in aws_instance.bind-ns :
     name => instance.private_ip
   }
 }
@@ -23,7 +23,7 @@ output "instance_private_ips" {
 output "instance_azs" {
   description = "Map of AZs keyed by instance name"
   value = {
-    for name, instance in aws_instance.bind :
+    for name, instance in aws_instance.bind-ns :
     name => instance.availability_zone
   }
 }
@@ -33,7 +33,7 @@ output "instance_azs" {
 output "instance_subnet_ids" {
   description = "Map of subnet IDs used by each instance"
   value = {
-    for name, instance in aws_instance.bind :
+    for name, instance in aws_instance.bind-ns :
     name => instance.subnet_id
   }
 }
@@ -42,7 +42,7 @@ output "instance_subnet_ids" {
 
 output "ami_id" {
   description = "AMI used for all instances"
-  value       = local.ami_id
+  value       = data.aws_ami.amzn2023_base.id
 }
 
 # SNS Email (safe)
