@@ -38,6 +38,11 @@ data "aws_ami" "amzn2023_base" {
     values = [local.ami_owner_id]
   }
 
+  filter {
+    name   = "name"
+    values = ["amzn2023-base-*"]
+  }
+
   name_regex = "^amzn2023-base-[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+)?$"
 }
 
