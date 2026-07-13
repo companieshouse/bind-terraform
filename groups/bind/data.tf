@@ -1,6 +1,6 @@
 # VPC Lookup
 
-data "aws_vpc" "heritage" {
+data "aws_vpc" "heritage-development" {
   filter {
     name   = "tag:Name"
     values = [var.vpc_name]
@@ -12,7 +12,7 @@ data "aws_vpc" "heritage" {
 data "aws_subnets" "application" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.heritage.id]
+    values = [data.aws_vpc.heritage-development.id]
   }
 
   filter {
@@ -60,7 +60,7 @@ data "aws_kms_alias" "ebs" {
 
 data "aws_route53_zone" "bind" {
   name   = local.dns_zone
-  vpc_id = data.aws_vpc.heritage.id
+  vpc_id = data.aws_vpc.heritage-development.id
 }
 
 data "vault_generic_secret" "kms_keys" {
