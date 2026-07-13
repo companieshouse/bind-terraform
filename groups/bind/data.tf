@@ -35,13 +35,10 @@ data "aws_ami" "amzn2023_base" {
 
   filter {
     name   = "owner-id"
-    values = ["${local.ami_owner_id}"]
+    values = [local.ami_owner_id]
   }
 
-  filter {
-    name   = "name"
-    values = ["amzn2023-base-1*"]
-  }
+  name_regex = "^amzn2023-base-[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9]+)?$"
 }
 
 data "aws_ec2_managed_prefix_list" "administration_cidr_ranges" {
