@@ -43,13 +43,13 @@ variable "instances" {
   }))
   default = {
     bind-a = {
-      name = "bind-a"
-      type = "t3.micro"
+      name = "bind-ns1"
+      type = "t3.medium"
       az   = "eu-west-2a"
     }
     bind-b = {
-      name = "bind-b"
-      type = "t3.micro"
+      name = "bind-ns2"
+      type = "t3.medium"
       az   = "eu-west-2b"
     }
   }

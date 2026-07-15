@@ -3,7 +3,7 @@
 data "aws_vpc" "heritage" {
   filter {
     name   = "tag:Name"
-    values = [var.vpc_name]
+    values = ["vpc-heritage-${var.environment}"]
   }
 }
 
@@ -68,11 +68,11 @@ data "vault_generic_secret" "kms_keys" {
 }
 
 data "vault_generic_secret" "kms_key_alias" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/kms_key_alias"
+  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
 }
 
 data "vault_generic_secret" "ami_owner" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ami_owner"
+  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
 }
 
 data "vault_generic_secret" "account_ids" {
@@ -92,9 +92,13 @@ data "vault_generic_secret" "shared_services_s3" {
 }
 
 data "vault_generic_secret" "ec2_user_ssh_public_key" {
-  path = "/applications/${var.aws_account}-${var.aws_region}/${var.service}/ec2-user/"
+  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
 }
 
-data "vault_generic_secret" "sns" {
-  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/chs-sns/"
+data "vault_generic_secret" "sns_email" {
+  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+}
+
+data "vault_generic_secret" "sns_url" {
+  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
 }
