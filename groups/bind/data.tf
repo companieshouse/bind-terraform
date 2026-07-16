@@ -102,3 +102,7 @@ data "vault_generic_secret" "sns_email" {
 data "vault_generic_secret" "sns_url" {
   path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
 }
+
+#data "vault_generic_secret" "bind_ansible_ssh_keys" {
+#  path = "applications/${var.aws_account}-${var.aws_region}/${var.service}/ansible"
+#}
