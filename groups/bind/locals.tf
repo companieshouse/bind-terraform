@@ -71,6 +71,8 @@ locals {
 
   ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
 
+  #bind_ansible_ssh_secrets    = data.vault_generic_secret.bind_ansible_ssh_keys.data
+  #bind_ansible_ssh_public_key = local.bind_ansible_ssh_secrets["ssh_public_key"]
   #  Disk config
 
   disk_info = {
