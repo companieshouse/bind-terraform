@@ -67,12 +67,14 @@ data "vault_generic_secret" "kms_keys" {
   path = "aws-accounts/${var.aws_account}/kms"
 }
 
-data "vault_generic_secret" "kms_key_alias" {
-  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+data "vault_kv_secret_v2" "kms_key_alias" {
+  mount = "team-unix-storage"
+  name = "${var.aws_account}-${var.aws_region}/${var.service_subtype}"
 }
 
-data "vault_generic_secret" "ami_owner" {
-  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+data "vault_kv_secret_v2" "ami_owner" {
+  mount = "team-unix-storage"
+  name = "${var.aws_account}-${var.aws_region}/${var.service_subtype}"
 }
 
 data "vault_generic_secret" "account_ids" {
@@ -91,16 +93,19 @@ data "vault_generic_secret" "shared_services_s3" {
   path = "aws-accounts/shared-services/s3"
 }
 
-data "vault_generic_secret" "ec2_user_ssh_public_key" {
-  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+data "vault_kv_secret_v2" "ec2_user_ssh_public_key" {
+  mount = "team-unix-storage"
+  name = "${var.aws_account}-${var.aws_region}/${var.service_subtype}"
 }
 
-data "vault_generic_secret" "sns_email" {
-  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+data "vault_kv_secret_v2" "sns_email" {
+  mount = "team-unix-storage"
+  name = "${var.aws_account}-${var.aws_region}/${var.service_subtype}"
 }
 
-data "vault_generic_secret" "sns_url" {
-  path = "team-unix-storage/${var.aws_account}-${var.aws_region}/${var.service_subtype}/"
+data "vault_kv_secret_v2" "sns_url" {
+  mount = "team-unix-storage"
+  name = "${var.aws_account}-${var.aws_region}/${var.service_subtype}"
 }
 
 #data "vault_generic_secret" "bind_ansible_ssh_keys" {

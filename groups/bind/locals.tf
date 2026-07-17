@@ -57,19 +57,19 @@ locals {
   account_ids_secrets = jsondecode(data.vault_generic_secret.account_ids.data_json)
 
   #  bind_ami_owner_id = local.account_ids_secrets["development"]
-  ami_owner    = data.vault_generic_secret.ami_owner.data
+  ami_owner    = data.vault_kv_secret_v2.ami_owner.data
   ami_owner_id = local.ami_owner["ami_owner"]
 
   #  KMS alias
 
 
-  kms_key_alias = data.vault_generic_secret.kms_key_alias.data["kms_key_alias"]
+  kms_key_alias = data.vault_kv_secret_v2.kms_key_alias.data["kms_key_alias"]
 
   #  SNS email
-  sns_email = data.vault_generic_secret.sns_email.data["linux_email"]
-  sns_url   = data.vault_generic_secret.sns_url.data["linux_url"]
+  sns_email = data.vault_kv_secret_v2.sns_email.data["linux_email"]
+  sns_url   = data.vault_kv_secret_v2.sns_url.data["linux_url"]
 
-  ssh_public_key = base64decode(data.vault_generic_secret.ec2_user_ssh_public_key.data["ssh_public_key"])
+  ssh_public_key = base64decode(data.vault_kv_secret_v2.ec2_user_ssh_public_key.data["ssh_public_key"])
 
   #bind_ansible_ssh_secrets    = data.vault_generic_secret.bind_ansible_ssh_keys.data
   #bind_ansible_ssh_public_key = local.bind_ansible_ssh_secrets["ssh_public_key"]
