@@ -1,0 +1,12 @@
+zones:
+  - name: development.aws.internal
+    file: development/forward/development.aws.internal.zone
+
+  - name: testing.aws.internal
+    file: staging/forward/testing.aws.internal.zone
+
+  - name: production.aws.internal
+    file: live/forward/production.aws.internal.zone
+
+  - name: 0.0.10.in-addr.arpa
+    file: development/reverse/10.0.0.zone

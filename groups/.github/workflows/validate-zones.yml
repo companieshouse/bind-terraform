@@ -1,0 +1,30 @@
+name: Validate DNS Zones
+
+on:
+  pull_request:
+    paths:
+      - 'groups/bind/zones/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install BIND Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bind9-utils
+
+      - name: Check Serial Numbers
+        run: |
+          bash groups/bind/validation/serial-check.sh
+
+      - name: Validate Zone Files
+        run: |
+          bash groups/bind/validation/named-checkzone.sh
+
+      - name: Validate named.conf
+        run: |
+          bash groups/bind/validation/named-checkconf.sh

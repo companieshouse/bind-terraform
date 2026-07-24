@@ -1,0 +1,10 @@
+zone "development.aws.internal" {
+    type master;
+    file "/var/named/development.aws.internal.zone";
+
+    allow-transfer {
+        10.0.10.11;
+    };
+
+    notify yes;
+};
